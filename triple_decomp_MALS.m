@@ -92,26 +92,17 @@ end
 
 
 function F = buildF(B, C)
-% Xây dựng ma trận F (r^2 x n2*n3) để cập nhật A(1)
-%
-% Dựa trên công thức trong bài báo, với B la (r x n2 x r), 
-% C la (r x r x n3). 
-% Ý tưởng: F(k,:) tương ứng với một "vector hoá" trên (B, C).
-%
     [r, n2, ~] = size(B);
     [~, ~, n3] = size(C);
     
-    % Kết quả F: r^2 x (n2*n3)
     F = zeros(r^2, n2*n3);
-    % Gán chỉ số cột = j + (t-1)*n2, chỉ số hàng = q + (s-1)*r
     for j = 1:n2
         for t = 1:n3
             col_idx = j + (t-1)*n2;  % cột
             for q = 1:r
                 for s = 1:r
-                    row_idx = q + (s-1)*r;  % hàng
-                    F(row_idx, col_idx) = B(q,j,s) * ...
-                                          C(q,s,t); 
+                    row_idx = q + (s-1)*r;  
+                    F(row_idx, col_idx) = B(q,j,s) * C(q,s,t); 
                 end
             end
         end
@@ -119,8 +110,6 @@ function F = buildF(B, C)
 end
 
 function G = buildG(A, C)
-% Xây dựng ma trận G (r^2 x n1*n3) để cập nhật B(2)
-%
     [n1, r, ~] = size(A);
     [~, ~, n3] = size(C);
     
@@ -131,8 +120,7 @@ function G = buildG(A, C)
             for p = 1:r
                 for s = 1:r
                     row_idx = p + (s-1)*r;
-                    G(row_idx, col_idx) = A(i,p,s)* ...
-                                          C(p,s,t);
+                    G(row_idx, col_idx) = A(i,p,s)* C(p,s,t);
                 end
             end
         end
@@ -140,8 +128,6 @@ function G = buildG(A, C)
 end
 
 function H = buildH(A, B)
-% Xây dựng ma trận H (r^2 x n1*n2) để cập nhật C(3)
-%
     [n1, r, ~] = size(A);
     [~, n2, ~] = size(B);
     
@@ -152,8 +138,7 @@ function H = buildH(A, B)
             for p = 1:r
                 for q = 1:r
                     row_idx = p + (q-1)*r;
-                    H(row_idx, col_idx) = A(i,p,q)* ...
-                                          B(p,j,q);
+                    H(row_idx, col_idx) = A(i,p,q)* B(p,j,q);
                 end
             end
         end

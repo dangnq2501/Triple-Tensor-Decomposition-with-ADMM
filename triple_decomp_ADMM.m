@@ -45,71 +45,46 @@ function [A, B, C, errHist] = triple_decomp_ADMM(X, r, rho, lambda, mu, maxIter,
         % Tính reconstruction hiện tại
         Xhat = triple_product(A, B, C);
         errHist(k) = norm(X(:) - Xhat(:)) / Xnorm;
-        fprintf('Global iter %d, rel. error = %.4e\n', k, errHist(k));
+        if mod(k, 5) == 0
+            fprintf('Global iter %d, rel. error = %.4e\n', k, errHist(k));
+        end
+        
         if k > 1 && abs(errHist(k) - errHist(k-1)) < tol*errHist(k-1)
             errHist = errHist(1:k);
             break;
         end
         
-        % --- Cập nhật A ---
-        % X(1): unfold X theo mode-1 (n1 x (n2*n3))
         X1 = reshape(X, [n1, n2*n3]);
-        % X(1) ở đây được dùng làm dữ liệu cho bài toán con của A.
-        % F = buildF(B, C) (kích thước: (r^2) x (n2*n3))
         F = buildF(B, C);
-        % Lấy giá trị unfolded của A từ vòng trước (A_old)
-        A_old_unf = unfold_A(A);  % kích thước: n1 x (r^2)
-        % Giải bài toán con cập nhật A qua ADMM nội tại:
+        A_old_unf = unfold_A(A); 
         A_new_unf = update_factor_ADMM(X1, F, A_old_unf, lambda, mu, maxInner, tol_inner);
-        % Reshape A_new_unf thành tensor A (n1 x r x r)
         A = reshape_A_from_A1(A_new_unf, n1, r);
         
-        % --- Cập nhật B ---
-        % Unfold X theo mode-2: (n2 x (n1*n3))
         X2 = reshape(permute(X, [2, 1, 3]), [n2, n1*n3]);
-        % G = buildG(A, C) (kích thước: (r^2) x (n1*n3))
         G = buildG(A, C);
-        B_old_unf = unfold_B(B);  % kích thước: n2 x (r^2)
+        B_old_unf = unfold_B(B);  % n2 x (r^2)
         B_new_unf = update_factor_ADMM(X2, G, B_old_unf, lambda, mu, maxInner, tol_inner);
         B = reshape_B_from_B2(B_new_unf, n2, r);
         
-        % --- Cập nhật C ---
-        % Unfold X theo mode-3: (n3 x (n1*n2))
         X3 = reshape(permute(X, [3, 1, 2]), [n3, n1*n2]);
-        % H = buildH(A, B) (kích thước: (r^2) x (n1*n2))
         H = buildH(A, B);
-        C_old_unf = unfold_C(C);  % kích thước: n3 x (r^2)
+        C_old_unf = unfold_C(C);  
         C_new_unf = update_factor_ADMM(X3, H, C_old_unf, lambda, mu, maxInner, tol_inner);
         C = reshape_C_from_C3(C_new_unf, n3, r);
     end
 end
 
-%% --- Hàm ADMM nội tại cho bài toán con cập nhật factor ---
 function X_new = update_factor_ADMM(Y, M, X_old, lambda, mu, maxInner, tol_inner)
-% Giải bài toán con:
 %   min_{X}  0.5*||Y - X*M||_F^2 + (lambda/2)*||X - X_old||_F^2,
-% sử dụng ADMM với splitting: đặt X = Z, với biến dual U.
 %
 % Augmented Lagrangian:
 %   L(X,Z,U) = 0.5*||Y - Z*M||_F^2 + (lambda/2)*||X - X_old||_F^2 + (mu/2)*||X - Z + U||_F^2.
 %
-% Các bước ADMM nội tại:
 %   Z-update:  Z = (Y*M' + mu*(X + U))/(M*M' + mu I)
 %   X-update:  X = (lambda*X_old + mu*(Z - U))/(lambda + mu)
 %   U-update:  U = U + (X - Z)
 %
-% Input:
-%   Y        - Dữ liệu unfolded theo mode tương ứng (n x p)
-%   M        - Ma trận phụ (kích thước: (r^2) x p)
-%   X_old    - Factor unfolded từ vòng trước (n x (r^2))
-%   lambda   - Hệ số proximal
-%   mu       - Tham số penalty nội tại
-%   maxInner - Số vòng lặp ADMM nội tại tối đa
-%   tol_inner- Ngưỡng hội tụ nội tại
-%
-% Output:
-%   X_new    - Factor cập nhật (n x (r^2))
-    
+
     [n, ~] = size(X_old);
     q = size(M,1);  % q = r^2
     X = X_old;
@@ -150,64 +125,76 @@ function Xn = unfold(X, mode)
     end
 end
 
-%% --- Hàm xây dựng ma trận phụ ---
 function F = buildF(B, C)
     % B: (r x n2 x r), C: (r x r x n3)
     [r, n2, ~] = size(B);
     [~, ~, n3] = size(C);
-    F = zeros(r^2, n2*n3);
-    for j = 1:n2
-        for t = 1:n3
-            col_idx = j + (t-1)*n2;
-            for q = 1:r
-                for s = 1:r
-                    row_idx = q + (s-1)*r;
-                    F(row_idx, col_idx) = B(q,j,s) * C(q,s,t);
-                end
-            end
-        end
-    end
+    % F = zeros(r^2, n2*n3);
+    % for j = 1:n2
+    %     for t = 1:n3
+    %         col_idx = j + (t-1)*n2;
+    %         for q = 1:r
+    %             for s = 1:r
+    %                 row_idx = q + (s-1)*r;
+    %                 F(row_idx, col_idx) = B(q,j,s) * C(q,s,t);
+    %             end
+    %         end
+    %     end
+    % end
+    B_unfold = reshape(unfold(B, 2), [n2, r*r, 1]);  
+    C_unfold = reshape(unfold(C, 3)', [1, r*r, n3]);
+    F = B_unfold .* C_unfold;
+    F = reshape(F, [n2, r, r, n3]);
+    F = reshape(permute(F, [2, 3, 1, 4]), [r*r, n2*n3]);
 end
 
 function G = buildG(A, C)
     % A: (n1 x r x r), C: (r x r x n3)
     [n1, r, ~] = size(A);
     [~, ~, n3] = size(C);
-    G = zeros(r^2, n1*n3);
-    for i = 1:n1
-        for t = 1:n3
-            col_idx = i + (t-1)*n1;
-            for p = 1:r
-                for s = 1:r
-                    row_idx = p + (s-1)*r;
-                    G(row_idx, col_idx) = A(i,p,s) * C(p,s,t);
-                end
-            end
-        end
-    end
+    % G = zeros(r^2, n1*n3);
+    % for i = 1:n1
+    %     for t = 1:n3
+    %         col_idx = i + (t-1)*n1;
+    %         for p = 1:r
+    %             for s = 1:r
+    %                 row_idx = p + (s-1)*r;
+    %                 G(row_idx, col_idx) = A(i,p,s) * C(p,s,t);
+    %             end
+    %         end
+    %     end
+    % end
+    A_unfold = reshape(unfold(A, 1), [n1, r*r, 1]);  
+    C_unfold = reshape(unfold(C, 3)', [1, r*r, n3]);
+    G = A_unfold .* C_unfold;
+    G = reshape(G, [n1, r, r, n3]);
+    G = reshape(permute(G, [2, 3, 1, 4]), [r*r, n1*n3]);
 end
 
 function H = buildH(A, B)
     % A: (n1 x r x r), B: (r x n2 x r)
     [n1, r, ~] = size(A);
     [~, n2, ~] = size(B);
-    H = zeros(r^2, n1*n2);
-    for i = 1:n1
-        for j = 1:n2
-            col_idx = i + (j-1)*n1;
-            for p = 1:r
-                for q = 1:r
-                    row_idx = p + (q-1)*r;
-                    H(row_idx, col_idx) = A(i,p,q) * B(p,j,q);
-                end
-            end
-        end
-    end
+    % H = zeros(r^2, n1*n2);
+    % for i = 1:n1
+    %     for j = 1:n2
+    %         col_idx = i + (j-1)*n1;
+    %         for p = 1:r
+    %             for q = 1:r
+    %                 row_idx = p + (q-1)*r;
+    %                 H(row_idx, col_idx) = A(i,p,q) * B(p,j,q);
+    %             end
+    %         end
+    %     end
+    % end
+    A_unfold = reshape(unfold(A, 1), [n1, r*r, 1]);  
+    B_unfold = reshape(unfold(B, 2)', [1, r*r, n2]);
+    H = A_unfold .* B_unfold;
+    H = reshape(H, [n1, r, r, n2]);
+    H = reshape(permute(H, [2, 3, 1, 4]), [r*r, n1*n2]);
 end
 
-%% --- Hàm “unfold” và “reshape” cho các yếu tố ---
 function A_unf = unfold_A(A)
-    % Unfold A (n1 x r x r) theo mode-1: trả về ma trận n1 x (r^2)
     [n1, r, ~] = size(A);
     A_unf = zeros(n1, r^2);
     for i = 1:n1
@@ -216,7 +203,6 @@ function A_unf = unfold_A(A)
 end
 
 function B_unf = unfold_B(B)
-    % Unfold B (r x n2 x r) theo mode-2: trả về ma trận n2 x (r^2)
     [r, n2, ~] = size(B);
     B_unf = zeros(n2, r^2);
     for j = 1:n2
@@ -225,7 +211,6 @@ function B_unf = unfold_B(B)
 end
 
 function C_unf = unfold_C(C)
-    % Unfold C (r x r x n3) theo mode-3: trả về ma trận n3 x (r^2)
     [r, ~, n3] = size(C);
     C_unf = zeros(n3, r^2);
     for t = 1:n3
@@ -234,7 +219,6 @@ function C_unf = unfold_C(C)
 end
 
 function A = reshape_A_from_A1(A1, n1, r)
-    % Chuyển A(1) (n1 x r^2) thành tensor A (n1 x r x r)
     A = zeros(n1, r, r);
     for i = 1:n1
         A(i,:,:) = reshape(A1(i,:), [r, r]);
@@ -242,7 +226,6 @@ function A = reshape_A_from_A1(A1, n1, r)
 end
 
 function B = reshape_B_from_B2(B2, n2, r)
-    % Chuyển B(2) (n2 x r^2) thành tensor B (r x n2 x r)
     B = zeros(r, n2, r);
     for j = 1:n2
         B(:,j,:) = reshape(B2(j,:), [r, r]);
@@ -250,17 +233,13 @@ function B = reshape_B_from_B2(B2, n2, r)
 end
 
 function C = reshape_C_from_C3(C3, n3, r)
-    % Chuyển C(3) (n3 x r^2) thành tensor C (r x r x n3)
     C = zeros(r, r, n3);
     for t = 1:n3
         C(:,:,t) = reshape(C3(t,:), [r, r]);
     end
 end
 
-%% --- Hàm tính triple product ---
 function Xhat = triple_product(A, B, C)
-    % Tính triple product: Xhat = A * B * C.
-    % Xhat(i,j,t) = sum_{p=1}^{r} sum_{q=1}^{r} A(i,p,q)*B(p,j,q)*C(p,q,t)
     [n1, ~, ~] = size(A);
     [~, n2, ~] = size(B);
     [~, ~, n3] = size(C);
