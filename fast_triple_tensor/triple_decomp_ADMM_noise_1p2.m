@@ -53,7 +53,6 @@ function x = prox_L12(y, lambda)
 % prox_L12 tính proximal operator cho hàm L1/2: 
 %   prox_{lambda * ||.||_{1/2}}(y)
 %
-% Với công thức theo Xu et al. (2012):
 %   Nếu |y| > tau, với tau = (3/2)*lambda^(2/3):
 %       x = (2/3)*y * [1 + cos((2*pi)/3 - (2/3)*phi)]
 %       với phi = arccos( (lambda/4) * (3/|y|)^(3/2) ).

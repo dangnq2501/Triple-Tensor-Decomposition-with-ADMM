@@ -1,18 +1,18 @@
 name = 'highway';
-video_name = name+'_ADMM_ABC.mat';
-load(video_name);
-video_name= name+'_ADMM_ADMM_ABC.avi';
-tensor2video(result_ADMM_reg,video_name);
+    video_name = name+'_ADMM_ABC.mat';
+    load(video_name);
+    video_name= name+'_ADMM_ADMM_ABC.avi';
+    tensor2video(result_ADMM_reg,video_name);
 
-video_name = name+'_ADMM_O.mat';
-load(video_name);
-video_name= name+'_ADMM_ADMM_O.avi';
-tensor2video(O,video_name);
+    video_name = name+'_ADMM_O.mat';
+    load(video_name);
+    video_name= name+'_ADMM_ADMM_O.avi';
+    tensor2video(O,video_name);
 
-video_name = name+'_ADMM_ABCO.mat';
-load(video_name);
-video_name= name+'_ADMM_ADMM_ABCO.avi';
-tensor2video(total,video_name);
+    video_name = name+'_ADMM_ABCO.mat';
+    load(video_name);
+    video_name= name+'_ADMM_ADMM_ABCO.avi';
+    tensor2video(total,video_name);
 
 load('video_ADMM_ABC_MALS.mat');
 tensor2video(result_ADMM_reg, 'highway_ADMM_MALS_ABC.avi');
