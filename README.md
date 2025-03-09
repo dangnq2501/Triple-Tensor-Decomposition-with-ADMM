@@ -6,9 +6,10 @@ This repository provides a MATLAB implementation of a triple tensor decompositio
 
 The algorithm solves the following optimization problem:
 
-\[
+$$
 \min_{O, A, B, C} \; \lambda \|X - ABC - O\|_F^2 + R(O)
-\]
+$$
+
 
 where:
 - \( X \) is the observed tensor,
