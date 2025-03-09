@@ -73,7 +73,7 @@ function X_new = update_factor_ADMM(Y, M, X_old, lambda, mu, maxInner, tol_inner
     
     for iter = 1:maxInner
         % Z-update:
-        Z = (Y * M' + mu*(X + U)) / (MtM + mu*Iq);
+        Z = (Y * M' + mu*(X + U)) * pinv(MtM + mu*Iq);
         % X-update:
         X_new_temp = (lambda*X_old + mu*(Z - U))/(lambda+mu);
         % U-update:

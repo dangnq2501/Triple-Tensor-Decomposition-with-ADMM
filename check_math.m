@@ -6,16 +6,14 @@ A = randn(n1, r, r);
 B = randn(r, n2, r);
 C = randn(r, r, n3);
 X = triple_product(A, B, C);
-Fkron = kronF(B, C);
-F = buildF(B, C);
-A1 = unfold(permute(A, [1, 3, 2]), 1);
 
-Y = abs(unfold(X, 1) - unfold(A, 1) * buildF(B, C));
-disp(min(Y(:)));
-Y = abs(unfold(X, 2) - unfold(B, 2) * buildG(A, C));
-disp(min(Y(:)));
-Y = abs(unfold(X, 3) - unfold(C, 3) * buildH(A, B));
-disp(min(Y(:)));
+
+Y = abs(unfold(X, 1) - unfold(permute(A, [1, 3, 2]), 1) * kronF(B, C));
+disp(min(abs(Y(:))));
+Y = abs(unfold(X, 2) - unfold(permute(B, [2, 3, 1]), 1) * kronG(A, C));
+disp(min(abs(Y(:))));
+Y = abs(unfold(X, 3) - unfold(C, 3) * kronH(A, B));
+disp(min(abs(Y(:))));
 % Y = abs(unfold(X, 2) - unfold(permute(B, [3 2 1]), 2) * kronG(A, C));
 % disp(min(Y(:)));
 % Y = abs(buildH(A, B) - kronH(A, B));
@@ -23,12 +21,12 @@ disp(min(Y(:)));
 function F = kronF(B, C)
     [r, n2, ~] = size(B);
     [~, ~, n3] = size(C);
-    % B1 = kron(eye(r), unfold(permute(B, [2, 1, 3]), 3));
-    % C1 = kron(unfold(C, 3)', eye(n2));
-    % F = B1 * C1;
-    B1 = kron(unfold(B, 2)', eye(n3));
-    C1 = kron(unfold(permute(C, [1 3 2]), 1), eye(r));
-    F = C1 * B1;
+    B1 = kron(eye(r), unfold(permute(B, [3, 2, 1]), 1));
+    C1 = kron(reshape(C, [r*r, n3]), eye(n2));
+    F = B1 * C1;
+    % B1 = kron(eye(n3), reshape(permute(B, [1, 3, 2]), [r*r, n2]));
+    % C1 = kron(unfold(permute(C, [1 3 2]), 1), eye(r));
+    % F = C1 * B1;
 end
 
 function G = kronG(A, C)
@@ -44,7 +42,6 @@ function H = kronH(A, B)
     [~, n2, ~] = size(B);
     A1 = kron(unfold(permute(A, [1, 3, 2]), 1)', eye(n2));
     B1 = kron(eye(r), unfold(B, 1));
-
     H = B1 * A1;
 end
 
@@ -75,11 +72,6 @@ end
 
 
 function F = buildF(B, C)
-    % BUILDF computes F from factors B and C as defined in the paper.
-    % B is of size (r x n2 x r) with entries B(p,j,s)
-    % C is of size (r x r x n3) with entries C(p,q,t)
-    % F is of size (r^2) x (n2*n3) and computed as:
-    %   F(q+(s-1)*r, j+(t-1)*n2) = \sum_{p=1}^{r} B(p,j,s)*C(p,q,t)
     [r, n2, ~] = size(B);
     [~, ~, n3] = size(C);
     F = zeros(r^2, n2*n3);
