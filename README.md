@@ -1,12 +1,10 @@
-# Triple Tensor Decomposition with ADMM and L₁/₂ Regularization
+# Triple Tensor Decomposition with ADMM and Regularization
 
 This repository provides a MATLAB implementation of a triple tensor decomposition algorithm using the Alternating Direction Method of Multipliers (ADMM) in the presence of noise. In this implementation, the data fidelity term is enforced by a least squares fit, while the noise is regularized using the L1 or L1/2 quasi-norm to promote sparsity.
 
 The algorithm solves the following optimization problem:
 
-\[
-\min_{O, A, B, C} \; \lambda\, \|X - A B C - O\|_F^2 + \regularization\
-\]
+\[ \min_{O, A, B, C} \; \lambda\, \|X - A B C - O\|_F^2 + \regularization\ \]
 
 where:
 - \(X\) is the observed tensor,
