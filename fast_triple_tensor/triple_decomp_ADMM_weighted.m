@@ -17,20 +17,20 @@ function [A, B, C, O, errHist] = triple_decomp_ADMM_weighted(X, r, rho, lambda, 
 
         T = triple_product(A, B, C);
         Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
-         
-         
-        W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta-p);
+
+
+        W_O = ((abs(X - Y_new) + epsilon) .^ theta )  ./ ((abs(X - Y_new) + epsilon) .^ (theta-p));
         O_new = weighted_soft_threshold(X - Y_new + Gamma/rho, lambda/rho, W_O);
-         
+
         Lambda = Lambda + rho * (T - Y_new);
         Gamma = Gamma + rho * (X - Y_new - O_new);
 
-        %T = triple_product(A, B, C);
-        %Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
-        %W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta - p));
-        %O_new = weighted_soft_threshold(X - Y_new + Gamma / rho, lambda / rho, W_O);
-
-        %Lambda = Lambda + rho * (T - Y_new);
+        % T = triple_product(A, B, C);
+        % Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
+        % W_O = ((abs(X - Y_new) + epsilon) .^ theta ) ./ ((abs(X - Y_new) + epsilon) .^ (theta - p));
+        % O_new = weighted_soft_threshold(X - Y_new + Gamma / rho, lambda / rho, W_O);
+        % 
+        % Lambda = Lambda + rho * (T - Y_new);
 
 
         A = update_A(X, A, B, C);
@@ -70,6 +70,15 @@ function Y = weighted_soft_threshold(X, tau, W)
 end
 
 
+function Y = soft_threshold(X, tau)
+    Y = sign(X) .* max(abs(X) - tau, 0);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Các hàm phụ update_B, update_C, triple_product, unfold, reshape_A_from_A1
+% (Giả sử các hàm này được định nghĩa như phiên bản code trước; dưới đây là
+% ví dụ minh họa đơn giản)
+
 function A = update_A(X, A, B, C)
     X1 = unfold(X, 1);
     F = buildF(B, C);
@@ -105,6 +114,26 @@ function Xn = unfold(X, mode)
     end
 end
 
+function Xhat = triple_product(A, B, C)
+    [n1, ~, ~] = size(A);
+    [~, n2, ~] = size(B);
+    [~, ~, n3] = size(C);
+    Xhat = zeros(n1, n2, n3);
+    for i = 1:n1
+        for j = 1:n2
+            for t = 1:n3
+                s = 0;
+                for pIdx = 1:size(A,2)
+                    for qIdx = 1:size(A,3)
+                        s = s + A(i,pIdx,qIdx)*B(pIdx,j,qIdx)*C(pIdx,qIdx,t);
+                    end
+                end
+                Xhat(i,j,t) = s;
+            end
+        end
+    end
+end
+
 function A = reshape_A_from_A1(A1, n1, r)
     A = zeros(n1, r, r);
     for i = 1:n1
@@ -126,3 +155,32 @@ function C = reshape_C_from_C3(C3, n3, r)
     end
 end
 
+function F = buildF(B, C)
+    [r, n2, ~] = size(B);
+    [~, ~, n3] = size(C);
+    B_unfold = reshape(unfold(B, 2), [n2, r*r, 1]);
+    C_unfold = reshape(unfold(C, 3)', [1, r*r, n3]);
+    F = B_unfold .* C_unfold;
+    F = reshape(F, [n2, r, r, n3]);
+    F = reshape(permute(F, [2,3,1,4]), [r*r, n2*n3]);
+end
+
+function G = buildG(A, C)
+    [n1, r, ~] = size(A);
+    [~, ~, n3] = size(C);
+    A_unfold = reshape(unfold(A, 1), [n1, r*r, 1]);
+    C_unfold = reshape(unfold(C, 3)', [1, r*r, n3]);
+    G = A_unfold .* C_unfold;
+    G = reshape(G, [n1, r, r, n3]);
+    G = reshape(permute(G, [2,3,1,4]), [r*r, n1*n3]);
+end
+
+function H = buildH(A, B)
+    [n1, r, ~] = size(A);
+    [~, n2, ~] = size(B);
+    A_unfold = reshape(unfold(A, 1), [n1, r*r, 1]);
+    B_unfold = reshape(unfold(B, 2)', [1, r*r, n2]);
+    H = A_unfold .* B_unfold;
+    H = reshape(H, [n1, r, r, n2]);
+    H = reshape(permute(H, [2,3,1,4]), [r*r, n1*n2]);
+end
