@@ -15,22 +15,22 @@ function [A, B, C, O, errHist] = triple_decomp_ADMM_weighted(X, r, rho, lambda, 
     
     for k = 1:maxIter
 
-        % T = triple_product(A, B, C);
-        % Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
-        % 
-        % 
-        % W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta-p);
-        % O_new = weighted_soft_threshold(X - Y_new + Gamma/rho, lambda/rho, W_O);
-        % 
-        % Lambda = Lambda + rho * (T - Y_new);
-        % Gamma = Gamma + rho * (X - Y_new - O_new);
-
         T = triple_product(A, B, C);
         Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
-        W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta - p));
-        O_new = weighted_soft_threshold(X - Y_new + Gamma / rho, lambda / rho, W_O);
-
+         
+         
+        W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta-p);
+        O_new = weighted_soft_threshold(X - Y_new + Gamma/rho, lambda/rho, W_O);
+         
         Lambda = Lambda + rho * (T - Y_new);
+        Gamma = Gamma + rho * (X - Y_new - O_new);
+
+        %T = triple_product(A, B, C);
+        %Y_new = (X - O + rho*(T + Lambda/rho)) / (1 + rho);
+        %W_O = 1 ./ ((abs(X - Y_new) + epsilon) .^ (theta - p));
+        %O_new = weighted_soft_threshold(X - Y_new + Gamma / rho, lambda / rho, W_O);
+
+        %Lambda = Lambda + rho * (T - Y_new);
 
 
         A = update_A(X, A, B, C);
