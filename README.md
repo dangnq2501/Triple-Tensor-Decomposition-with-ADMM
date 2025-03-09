@@ -12,11 +12,11 @@ $$
 
 
 where:
-- $X$ is the observed tensor,
-- $A, B, C $ are the factor tensors,
-- $O $ represents the noise component,
-- $ \lambda $ is a parameter that controls the trade-off between data fidelity and sparsity, and
-- $ R(O) $ is the regularization term, which can be either:
+- $$X$$ is the observed tensor,
+- $$A, B, C$$ are the factor tensors,
+- $$O$$ represents the noise component,
+- $$\lambda$$ is a parameter that controls the trade-off between data fidelity and sparsity, and
+- $R(O)$ is the regularization term, which can be either:
   - $ \|O\|_1 $ (L1 norm for promoting sparsity), or
   - $ \|O\|_{1/2} $ (L1/2 quasi-norm for enhanced sparsity).
 
