@@ -1,5 +1,5 @@
-function [A, B, C, O, errHist] = triple_decomp_ADMM_noise(X, r, maxIter, tol, rho, lambda, mu, maxInner, tol_inner)
-%
+function [A, B, C, O, errHist] = triple_decomp_ADMM_noise(X, r, opts)
+opts
 %      min_{A,B,C,O} 0.5*||X - A*B*C - O||_F^2 + ||O||_1
 %
 %   X         - Input tensor (n1 x n2 x n3)
@@ -11,8 +11,12 @@ function [A, B, C, O, errHist] = triple_decomp_ADMM_noise(X, r, maxIter, tol, rh
 %   mu        - Inner ADMM penalty parameter for factor updates (e.g., 1)
 %   maxInner  - Maximum number of inner ADMM iterations (e.g., 50)
 %   tol_inner - Inner ADMM tolerance (e.g., 1e-4)
-
-
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    rho = opts.rho;
+    mu = opts.mu;
+    maxInner = opts.maxIter;
+    tol_inner = opts.tol;
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:));
     

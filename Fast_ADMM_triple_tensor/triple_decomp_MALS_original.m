@@ -1,5 +1,8 @@
-function [A, B, C, errHist] = triple_decomp_MALS_original(X, r, maxIter, tol, lambda)
+function [A, B, C, errHist] = triple_decomp_MALS_original(X, r, opts)
 
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    lambda = opts.lambda
 
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:));

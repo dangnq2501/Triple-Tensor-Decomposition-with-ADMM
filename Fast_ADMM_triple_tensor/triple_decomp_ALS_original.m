@@ -1,6 +1,7 @@
-function [A, B, C, errHist] = triple_decomp_ALS_original(X, r, maxIter, tol)
+function [A, B, C, errHist] = triple_decomp_ALS_original(X, r, opts)
 % [A, B, C, errHist] = triple_decomp_ALS(X, r, maxIter, tol)
-
+    maxIter = opts.maxIter;
+    tol = opts.tol;
 
 
     [n1, n2, n3] = size(X);

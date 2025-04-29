@@ -1,4 +1,4 @@
-function [A, B, C, errHist] = triple_decomp_ADMM(X, r, rho, lambda, mu, maxIter, tol, maxInner, tol_inner)
+function [A, B, C, errHist] = triple_decomp_ADMM(X, r, opts)
 %   min_{Factor} 0.5*||X_mode - Factor * M||_F^2 + (lambda/2)||Factor - Factor_old||_F^2,
 %
 %   X         - Tensor gốc (n1 x n2 x n3)
@@ -6,8 +6,14 @@ function [A, B, C, errHist] = triple_decomp_ADMM(X, r, rho, lambda, mu, maxIter,
 %   rho       - Tham số penalty global cho ADMM (ví dụ: 1)
 %   lambda    - Hệ số proximal trong bài toán con (ví dụ: 1e-3)
 %   mu        - Tham số penalty nội tại cho ADMM của mỗi factor (ví dụ: 1)
-
-
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    lambda = opts.lambda
+    rho = opts.rho;
+    mu = opts.mu;
+    maxInner = opts.maxIter;
+    tol_inner = opts.tol;
+    
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:));
     

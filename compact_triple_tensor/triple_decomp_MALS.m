@@ -1,9 +1,10 @@
-function [A, B, C, errHist] = triple_decomp_MALS(X, r, maxIter, tol)
+function [A, B, C, errHist] = triple_decomp_MALS(X, r, opts)
 %   X: tensor (n1 x n2 x n3)
 %   r: rank <= mid{n1, n2, n3}
 %   maxIter: max Iterator
 %   tol: relative change
-
+    maxIter = opts.maxIter;
+    tol = opts.tol;
     [n1, n2, n3] = size(X);
     Xf = norm(X(:));    
 

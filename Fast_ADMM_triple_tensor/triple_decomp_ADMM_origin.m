@@ -1,4 +1,4 @@
-function [A, B, C, O, errHist] = triple_decomp_ADMM_origin(X, r, maxIter, tol, rho, lambda, mu, maxInner, tol_inner)
+function [A, B, C, O, errHist] = triple_decomp_ADMM_origin(X, r, opts)
 % TRIPLE_DECOMP_ADMM_GLOBAL_FULL solves the problem:
 %
 %      min_{A,B,C,O} 0.5*||X - A*B*C - O||_F^2 + ||O||_1
@@ -38,7 +38,13 @@ function [A, B, C, O, errHist] = triple_decomp_ADMM_origin(X, r, maxIter, tol, r
 %                C: r x r x n3.
 %   O         - Sparse error tensor (n1 x n2 x n3)
 %   errHist   - Global relative error history: ||X - (A*B*C + O)||_F / ||X||_F
-
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    lambda = opts.lambda
+    rho = opts.rho;
+    mu = opts.mu;
+    maxInner = opts.maxIter;
+    tol_inner = opts.tol;
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:));
     

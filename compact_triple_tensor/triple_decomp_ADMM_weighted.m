@@ -1,5 +1,12 @@
-function [A, B, C, O, errHist] = triple_decomp_ADMM_weighted(X, r, rho, lambda, gamma_A, epsilon, p, theta, maxIter, tol)
-
+function [A, B, C, O, errHist] = triple_decomp_ADMM_weighted(X, r, opts)
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    lambda = opts.lambda
+    rho = opts.rho;
+    gamma_A = opts.gamma_A;
+    epsilon = opts.epsilon;
+    p = opts.p;
+    theta = opts.theta;
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:));
     

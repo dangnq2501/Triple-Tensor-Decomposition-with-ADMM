@@ -1,4 +1,9 @@
-function [A, B, C, O, errHist] = triple_decomp_ADMM_noise_1p2(X, r, rho, lambda, maxIter, tol)
+function [A, B, C, O, errHist] = triple_decomp_ADMM_noise_1p2(X, r, rho, opts)
+    maxIter = opts.maxIter;
+    tol = opts.tol;
+    lambda = opts.lambda
+    rho = opts.rho;
+
     [n1, n2, n3] = size(X);
     Xnorm = norm(X(:)); 
     
