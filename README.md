@@ -32,12 +32,11 @@ We propose a two-constraint **ADMM optimization scheme** with a convex $\ell_1$ 
 ## Algorithmic Highlights
 
 ### 1. Model Formulation
-We solve:
-\[
-\min_{\AAA,\BBB,\CCC,\OOO,\EEE} 
-\frac{1}{2}\|\mathcal{P}_\Omega(\XXX - \![\![\AAA,\BBB,\CCC]\!] - \OOO - \EEE)\|_F^2 + 
-\lambda\|\OOO\|_1
-\]
+min_{A,B,C,O,E}
+½‖ X − [[A,B,C]] − O − E ‖_F² + λ‖O‖₁
+subject to:
+structural constraints on E,
+nonnegativity on (A,B,C)
 subject to structural constraints on $\EEE$ and nonnegativity on $(\AAA,\BBB,\CCC)$.
 
 ### 2. Optimization
@@ -45,10 +44,6 @@ Each iteration performs:
 1. **Core Updates:** Ridge-regularized least squares on mode-wise unfoldings.  
 2. **Sparse Update:** Closed-form soft-thresholding.  
 3. **Dual Update:** Lightweight Lagrange multiplier updates.  
-
-The convergence of the sequence  
-$\mathcal{S}^{(t)} = \{\XXX^{(t)}, \AAA^{(t)}, \BBB^{(t)}, \CCC^{(t)}, \OOO^{(t)}, \EEE^{(t)}\}$  
-is guaranteed to a stationary point of the augmented Lagrangian (see *Lemma 1*).
 
 ---
 
