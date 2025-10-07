@@ -1,0 +1,28 @@
+function psnr = psnr_ybz(imagery1, imagery2)
+%==========================================================================
+% Evaluates the quality assessment indices for two tensors.
+%
+% Input:
+%   imagery1 - the reference tensor
+%   imagery2 - the target tensor
+
+% NOTE: the tensor is a I1*I2*...*IN array and DYNAMIC RANGE [0, 255]. 
+
+% Output:
+%   psnr - Peak Signal-to-Noise Ratio
+%
+% by Yi Peng
+% Updated by Yu-Bang Zheng 11/19/2019
+%==========================================================================
+Nway = size(imagery1);
+if length(Nway)>3
+    imagery1 = reshape(imagery1,Nway(1),Nway(2),[]);
+    imagery2 = reshape(imagery2,Nway(1),Nway(2),[]);
+end
+psnr = zeros(prod(Nway(3:end)),1);
+for i = 1:prod(Nway(3:end))
+    psnr(i) = psnr_index(imagery1(:, :, i), imagery2(:, :, i));
+end
+psnr = mean(psnr);
+
+

@@ -1,28 +1,33 @@
-# Triple Tensor Decomposition with ADMM and L₁/₂ Regularization
+# Fast and Robust Triple Tensor Decomposition Under Data Corruption (TriTD-ADMM)
 
-This repository provides a MATLAB implementation of a triple tensor decomposition algorithm using the Alternating Direction Method of Multipliers (ADMM) in the presence of noise. In this implementation, the data fidelity term is enforced by a least squares fit, while the noise is regularized using the \( L_1 \) or \( L_{1/2} \) quasi-norm to promote sparsity.
+Official code for the paper **“Fast and Robust Triple Tensor Decomposition Under Data Corruption.”**  
+We propose **TriTD-ADMM**, a fast and robust solver for Triple Tensor Decomposition (TriTD) that models sparse corruptions with an L1 term and accelerates mode-wise updates via a **reshape–permute (Kronecker-free)** design.
 
-## Optimization Problem
+---
 
-The algorithm solves the following optimization problem:
+## Highlights
+
+- **Robust to outliers:** explicit sparse residual with L1 regularization.
+- **Simple & fast ADMM:** closed-form soft-thresholding for the sparse term; tiny `r^2 × r^2` ridge systems for core updates.
+- **Kronecker-free acceleration (RPAS):** builds designs `F, G, H` using only `reshape/permute + GEMM` (no Khatri–Rao/Kronecker materialization).
+- **Strong results** on tensor completion and video background modeling (BMC): competitive accuracy with substantial speedups (up to **63.71×** vs. baselines in our tests).
+
+---
+
+## Method (TL;DR)
+
+Given a 3-way tensor `X`, TriTD factorizes it via three coupled 3-way cores `(A, B, C)` with “triple rank” `r`.  
+We solve the **robust** model
 
 $$
-\min_{O, A, B, C} \; \lambda \|X - ABC - O\|_F^2 + R(O)
+\mathcal X \;=\; \operatorname{TriTD}(\mathcal A,\mathcal B,\mathcal C) \;+\; \mathbf O.
 $$
 
+---
 
-where:
-- $$X$$ is the observed tensor,
-- $$A, B, C$$ are the factor tensors,
-- $$O$$ represents the noise component,
-- $$\lambda$$ is a parameter that controls the trade-off between data fidelity and sparsity, and
-- $$R(O)$$ is the regularization term, which can be either:
-  - $$\|O\|_1$$ (L1 norm for promoting sparsity), or
-  - $$\|O\|_{1/2}$$ (L1/2 quasi-norm for enhanced sparsity).
+## Triple Tensor Decomposition (TriTD)
 
-## Features
-
-- **Triple Tensor Decomposition:** Factorizes a tensor $$A$$ into three components $$A, B, C$$ using an Alternating Least Squares (ALS) approach.
-- **ADMM Framework:** Uses ADMM to alternate between least squares updates for the factor matrices and proximal updates for the noise term.
-- **L1/2 Regularization:** Implements a custom proximal operator for the $$L_{1/2}$$ quasi-norm to enforce sparsity in the noise.
-- **Data Fidelity Weighting:** Incorporates a parameter  $$\lambda $$ to control the trade-off between data fidelity and sparsity regularization.
+$$
+\mathcal X \;=\; \sum_{p=1}^{r}\sum_{q=1}^{r}\sum_{s=1}^{r}
+\;\mathcal A_{:,p,q}\ \circ\ \mathcal B_{s,:,q}\ \circ\ \mathcal C_{s,p,:}\,.
+$$
