@@ -81,4 +81,17 @@ Qualitatively, TriTD-ADMM cleanly separates foreground \(O\) from background \(L
 
 ## Complexity & Convergence
 
-Per iteration, TriTD-ADMM costs \(\mathcal{O}(3 n^3 r^2 + 3 n^2 r^4 + 3 r^6)\) with Kronecker-free designs, and exhibits monotone objective descent with convergence to a stationary point under mild conditions.
+Per iteration, TriTD-ADMM costs $\mathcal{O}(3 n^3 r^2 + 3 n^2 r^4 + 3 r^6)$ with Kronecker-free designs, and exhibits monotone objective descent with convergence to a stationary point under mild conditions.
+
+---
+
+## Project Structure
+
+```
+├── fast_robust_triple_tensor/  # TriTD-ADMM core (triple_decomp_ADMM.m, utilities)
+├── other_methods/              # Other comparison methods
+├── traffic_triple_comparison.m
+└── video_triple_comparison.m
+```
+
+---
