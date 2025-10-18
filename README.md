@@ -40,8 +40,7 @@ We estimate low-rank cores \((A,B,C)\) and sparse corruption \(O\) by
 The augmented Lagrangian is optimized by ADMM with soft-thresholding for the sparse copy \(E\) and ridge-regularized least squares for \((A,B,C)\).
 
 ### RPAS (Reshape–Permute Acceleration Strategy)
-Instead of building Kronecker products to form the mode-wise design matrices \(F,G,H\), we compute them *Kronecker-free* via `reshape/permute` and a single GEMM per mode (e.g., \(F=\text{RPAS}(B,C)\)), reducing the cost from \(\mathcal{O}(n^3 r^4)\) to \(\mathcal{O}(n^2 r^3)\).
-
+Instead of building Kronecker products to form the mode-wise design matrices $F,G,H$, we compute them *Kronecker-free* via `reshape/permute` and a single GEMM per mode (e.g., $F=\text{RPAS}(B,C)$), reducing the cost from $\mathcal{O}(n^3 r^4)$ to $\mathcal{O}(n^2 r^3)$.
 
 ---
 
